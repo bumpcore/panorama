@@ -7,6 +7,7 @@ namespace BumpCore\Panorama\Tests;
 use BumpCore\Panorama\Eloquent\QueryBackedBuilder;
 use BumpCore\Panorama\Exceptions\InvalidQuerySourceException;
 use BumpCore\Panorama\Exceptions\MissingQuerySourceException;
+use BumpCore\Panorama\Tests\Fixtures\Customer;
 use BumpCore\Panorama\Tests\Fixtures\CustomerBalance;
 use BumpCore\Panorama\Tests\Fixtures\CustomerBalanceFromQueryBuilder;
 use BumpCore\Panorama\Tests\Fixtures\EmptyAliasModel;
@@ -28,6 +29,44 @@ final class BackedByQueryTest extends TestCase
         self::assertSame(125.5, $result->getAttribute('balance'));
         self::assertSame(2, $result->getAttribute('invoice_count'));
         self::assertSame('Acme', $result->customer()->getResults()?->getAttribute('name'));
+    }
+
+    public function test_it_eager_loads_relations_defined_on_query_backed_models(): void
+    {
+        $query = $this->customerBalanceQuery();
+        $query->with('customer');
+        $query->withParams(customer_id: 1, status: 'open');
+        $balance = $query->firstOrFail();
+
+        self::assertTrue($balance->relationLoaded('customer'));
+        $customer = $balance->customer()->getResults();
+        self::assertNotNull($customer);
+        self::assertSame('Acme', $customer->getAttribute('name'));
+    }
+
+    public function test_normal_models_can_use_query_backed_models_as_relations(): void
+    {
+        $customer = Customer::query()
+            ->with('balance')
+            ->whereKey(1)
+            ->firstOrFail();
+
+        self::assertTrue($customer->relationLoaded('balance'));
+        $balance = $customer->balance()->getResults();
+        self::assertNotNull($balance);
+
+        self::assertSame(135.5, $balance->getAttribute('balance'));
+        self::assertSame(3, $balance->getAttribute('invoice_count'));
+    }
+
+    public function test_query_backed_relations_work_with_where_has(): void
+    {
+        $customers = Customer::query()
+            ->whereHas('balance', static fn ($query) => $query->where('balance', '>', 500))
+            ->pluck('name')
+            ->all();
+
+        self::assertSame(['Globex'], $customers);
     }
 
     public function test_it_accepts_array_params_and_keeps_normal_builder_chaining(): void

@@ -26,13 +26,16 @@ final class CustomerBalance extends Model
     /**
      * @return Builder<Invoice>
      */
-    public function newSource(int $customer_id, ?string $status = null): Builder
+    public function newSource(?int $customer_id = null, ?string $status = null): Builder
     {
         $query = Invoice::query();
         $baseQuery = $query->getQuery();
 
         $baseQuery->selectRaw('customer_id, sum(amount) as balance, count(*) as invoice_count');
-        $baseQuery->where('customer_id', $customer_id);
+
+        if ($customer_id !== null) {
+            $baseQuery->where('customer_id', $customer_id);
+        }
 
         if ($status !== null) {
             $baseQuery->where('status', $status);
