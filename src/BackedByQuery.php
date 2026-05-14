@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace BumpCore\Panorama;
 
+use BumpCore\Panorama\Contracts\QueryBackedModel;
 use BumpCore\Panorama\Eloquent\QueryBackedBuilder;
 use BumpCore\Panorama\Exceptions\MissingQuerySourceException;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Model
+ * @mixin QueryBackedModel
  */
 trait BackedByQuery
 {
@@ -18,7 +19,7 @@ trait BackedByQuery
      * Creates a Panorama-aware Eloquent builder for the model.
      *
      * @param \Illuminate\Database\Query\Builder $query
-     * @return QueryBackedBuilder<static>
+     * @return QueryBackedBuilder<Model>
      */
     public function newEloquentBuilder($query): QueryBackedBuilder
     {
@@ -49,16 +50,24 @@ trait BackedByQuery
     }
 
     /**
-     * Starts a query with source params already attached.
+     * Builds the backing source query with validated builder params.
+     *
+     * @internal
      *
      * @param array<string, mixed> $params
-     * @return QueryBackedBuilder<static>
      */
-    public static function queryWithParams(array $params = [], mixed ...$namedParams): QueryBackedBuilder
+    public function buildPanoramaSource(array $params): mixed
     {
-        /** @var QueryBackedBuilder<static> $query */
-        $query = static::query();
+        return call_user_func_array([$this, 'newSource'], $params);
+    }
 
-        return $query->withParams($params, ...$namedParams);
+    /**
+     * Returns the source alias through a concrete method PHPStan can analyze.
+     *
+     * @internal
+     */
+    public function panoramaSourceAlias(): string
+    {
+        return $this->querySourceAlias();
     }
 }

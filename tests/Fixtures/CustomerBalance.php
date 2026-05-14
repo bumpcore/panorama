@@ -23,21 +23,24 @@ final class CustomerBalance extends Model
 
     protected $guarded = [];
 
-    protected $casts = [
-        'balance' => 'float',
-        'invoice_count' => 'integer',
-    ];
-
     /**
      * @return Builder<Invoice>
      */
     public function newSource(int $customer_id, ?string $status = null): Builder
     {
-        return Invoice::query()
-            ->selectRaw('customer_id, sum(amount) as balance, count(*) as invoice_count')
-            ->where('customer_id', $customer_id)
-            ->when($status !== null, static fn (Builder $query): Builder => $query->where('status', $status))
-            ->groupBy('customer_id');
+        $query = Invoice::query();
+        $baseQuery = $query->getQuery();
+
+        $baseQuery->selectRaw('customer_id, sum(amount) as balance, count(*) as invoice_count');
+        $baseQuery->where('customer_id', $customer_id);
+
+        if ($status !== null) {
+            $baseQuery->where('status', $status);
+        }
+
+        $baseQuery->groupBy('customer_id');
+
+        return $query;
     }
 
     /**
@@ -46,5 +49,16 @@ final class CustomerBalance extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'balance' => 'float',
+            'invoice_count' => 'integer',
+        ];
     }
 }

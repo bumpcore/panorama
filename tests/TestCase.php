@@ -6,6 +6,7 @@ namespace BumpCore\Panorama\Tests;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Builder;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -31,7 +32,7 @@ abstract class TestCase extends BaseTestCase
 
     private function createSchema(): void
     {
-        $schema = $this->database->schema();
+        $schema = $this->schema();
 
         $schema->create('customers', static function (Blueprint $table): void {
             $table->increments('id');
@@ -59,5 +60,10 @@ abstract class TestCase extends BaseTestCase
             ['customer_id' => 1, 'status' => 'paid', 'amount' => 10.00],
             ['customer_id' => 2, 'status' => 'open', 'amount' => 999.00],
         ]);
+    }
+
+    private function schema(): Builder
+    {
+        return $this->database->getConnection()->getSchemaBuilder();
     }
 }

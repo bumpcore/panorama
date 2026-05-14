@@ -28,8 +28,8 @@
         "analyse": "phpstan analyse --debug --memory-limit=1G",
         "test": "phpunit",
         "test:coverage": "@php scripts/run-coverage.php",
-        "cs": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --verbose",
-        "cs:check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --dry-run --verbose"
+        "cs": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --sequential --verbose",
+        "cs:check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --dry-run --sequential --verbose"
     },
     "config": {
         "sort-packages": true
