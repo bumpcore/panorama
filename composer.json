@@ -1,0 +1,37 @@
+{
+    "name": "bumpcore/panorama",
+    "description": "Query-backed Eloquent models for Laravel.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "BumpCore\\Panorama\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BumpCore\\Panorama\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "illuminate/database": "^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.75",
+        "laravel/boost": "^2.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^12.0"
+    },
+    "scripts": {
+        "analyse": "phpstan analyse --debug --memory-limit=1G",
+        "test": "phpunit",
+        "test:coverage": "@php scripts/run-coverage.php",
+        "cs": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --verbose",
+        "cs:check": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --dry-run --verbose"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
