@@ -11,6 +11,7 @@ use BumpCore\Panorama\Tests\Fixtures\CustomerBalance;
 use BumpCore\Panorama\Tests\Fixtures\CustomerBalanceFromQueryBuilder;
 use BumpCore\Panorama\Tests\Fixtures\EmptyAliasModel;
 use BumpCore\Panorama\Tests\Fixtures\InvalidSourceModel;
+use BumpCore\Panorama\Tests\Fixtures\Invoice;
 use BumpCore\Panorama\Tests\Fixtures\MissingSourceModel;
 
 final class BackedByQueryTest extends TestCase
@@ -73,9 +74,35 @@ final class BackedByQueryTest extends TestCase
         self::assertSame([1, 'open', 100], $query->getBindings());
     }
 
+    public function test_reapplying_an_already_applied_source_is_a_noop(): void
+    {
+        $query = CustomerBalance::query()
+            ->withParams(customer_id: 1, status: 'open');
+
+        $query->applyQuerySource();
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+
+        $query->applyQuerySource();
+
+        self::assertSame($sql, $query->toSql());
+        self::assertSame($bindings, $query->getBindings());
+    }
+
     public function test_models_receive_a_panorama_builder(): void
     {
         self::assertInstanceOf(QueryBackedBuilder::class, CustomerBalance::query());
+    }
+
+    public function test_query_backed_builders_reject_models_without_the_trait(): void
+    {
+        $builder = new QueryBackedBuilder(Invoice::query()->getQuery());
+        $builder->setModel(new Invoice());
+
+        $this->expectException(InvalidQuerySourceException::class);
+        $this->expectExceptionMessage('is not backed by a Panorama query source');
+
+        $builder->get();
     }
 
     public function test_missing_source_definitions_fail_clearly(): void
