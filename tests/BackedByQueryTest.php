@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace BumpCore\Panorama\Tests;
 
-use BumpCore\Panorama\Eloquent\QueryBackedBuilder;
+use BumpCore\Panorama\Eloquent\QuerySourceScope;
 use BumpCore\Panorama\Exceptions\InvalidQuerySourceException;
 use BumpCore\Panorama\Exceptions\MissingQuerySourceException;
+use BumpCore\Panorama\Tests\Fixtures\CustomBuilderCustomerBalance;
+use BumpCore\Panorama\Tests\Fixtures\CustomCustomerBalanceBuilder;
 use BumpCore\Panorama\Tests\Fixtures\Customer;
 use BumpCore\Panorama\Tests\Fixtures\CustomerBalance;
 use BumpCore\Panorama\Tests\Fixtures\CustomerBalanceFromQueryBuilder;
@@ -14,6 +16,7 @@ use BumpCore\Panorama\Tests\Fixtures\EmptyAliasModel;
 use BumpCore\Panorama\Tests\Fixtures\InvalidSourceModel;
 use BumpCore\Panorama\Tests\Fixtures\Invoice;
 use BumpCore\Panorama\Tests\Fixtures\MissingSourceModel;
+use Illuminate\Database\Eloquent\Builder;
 use InvalidArgumentException;
 
 final class BackedByQueryTest extends TestCase
@@ -22,7 +25,7 @@ final class BackedByQueryTest extends TestCase
     {
         $balance = $this->customerBalanceQuery();
         $balance->where('balance', '>', 100);
-        $balance->withParams(customer_id: 1, status: 'open');
+        $this->withParams($balance, customer_id: 1, status: 'open');
         $result = $balance->firstOrFail();
 
         self::assertSame(1, $result->getAttribute('customer_id'));
@@ -35,7 +38,7 @@ final class BackedByQueryTest extends TestCase
     {
         $query = $this->customerBalanceQuery();
         $query->with('customer');
-        $query->withParams(customer_id: 1, status: 'open');
+        $this->withParams($query, customer_id: 1, status: 'open');
         $balance = $query->firstOrFail();
 
         self::assertTrue($balance->relationLoaded('customer'));
@@ -73,7 +76,7 @@ final class BackedByQueryTest extends TestCase
     {
         $query = $this->customerBalanceQuery();
         $query->where('invoice_count', '=', 2);
-        $query->withParams([
+        $this->withParams($query, [
             'customer_id' => 1,
             'status' => 'open',
         ]);
@@ -86,8 +89,8 @@ final class BackedByQueryTest extends TestCase
     public function test_later_params_replace_earlier_params_like_builder_state(): void
     {
         $query = $this->customerBalanceQuery();
-        $query->withParams(customer_id: 2);
-        $query->withParams(customer_id: 1, status: 'paid');
+        $this->withParams($query, customer_id: 2);
+        $this->withParams($query, customer_id: 1, status: 'paid');
         $balance = $query->firstOrFail();
 
         self::assertSame(10.0, $balance->getAttribute('balance'));
@@ -97,9 +100,8 @@ final class BackedByQueryTest extends TestCase
     public function test_it_supports_sources_returning_base_query_builders(): void
     {
         $query = CustomerBalanceFromQueryBuilder::query();
-        self::assertInstanceOf(QueryBackedBuilder::class, $query);
 
-        $query->withParams(customer_id: 2);
+        (new CustomerBalanceFromQueryBuilder())->scopeWithParams($query, customer_id: 2);
         $balance = $query->firstOrFail();
 
         self::assertSame(2, $balance->getAttribute('customer_id'));
@@ -110,30 +112,22 @@ final class BackedByQueryTest extends TestCase
     {
         $query = $this->customerBalanceQuery();
         $query->where('balance', '>', 100);
-        $query->withParams(customer_id: 1, status: 'open');
+        $this->withParams($query, customer_id: 1, status: 'open');
 
-        self::assertStringContainsString('from (select customer_id, sum(amount) as balance', $query->toSql());
-        self::assertSame([1, 'open', 100], $query->getBindings());
+        self::assertStringContainsString('from (select customer_id, sum(amount) as balance', $query->toBase()->toSql());
+        self::assertSame([1, 'open', 100], $query->toBase()->getBindings());
     }
 
-    public function test_reapplying_an_already_applied_source_is_a_noop(): void
+    public function test_consumers_can_keep_their_own_eloquent_builder(): void
     {
-        $query = $this->customerBalanceQuery();
-        $query->withParams(customer_id: 1, status: 'open');
+        $query = CustomBuilderCustomerBalance::query();
+        self::assertInstanceOf(CustomCustomerBalanceBuilder::class, $query);
 
-        $query->applyQuerySource();
-        $sql = $query->toSql();
-        $bindings = $query->getBindings();
+        $query->whereLargeBalance();
+        (new CustomBuilderCustomerBalance())->scopeWithParams($query, customer_id: 2);
+        $balance = $query->firstOrFail();
 
-        $query->applyQuerySource();
-
-        self::assertSame($sql, $query->toSql());
-        self::assertSame($bindings, $query->getBindings());
-    }
-
-    public function test_models_receive_a_panorama_builder(): void
-    {
-        self::assertInstanceOf(QueryBackedBuilder::class, CustomerBalance::query());
+        self::assertSame(999.0, $balance->getAttribute('balance'));
     }
 
     public function test_params_must_be_named(): void
@@ -143,18 +137,15 @@ final class BackedByQueryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must use string keys');
 
-        $query->withParams([1]);
+        $this->withParams($query, [1]);
     }
 
-    public function test_query_backed_builders_reject_models_without_the_trait(): void
+    public function test_query_source_scope_rejects_models_without_the_trait(): void
     {
-        $builder = new QueryBackedBuilder(Invoice::query()->getQuery());
-        $builder->setModel(new Invoice());
-
         $this->expectException(InvalidQuerySourceException::class);
         $this->expectExceptionMessage('is not backed by a Panorama query source');
 
-        $builder->get();
+        (new QuerySourceScope())->apply(Invoice::query(), new Invoice());
     }
 
     public function test_missing_source_definitions_fail_clearly(): void
@@ -182,14 +173,20 @@ final class BackedByQueryTest extends TestCase
     }
 
     /**
-     * @return QueryBackedBuilder<CustomerBalance>
+     * @return Builder<CustomerBalance>
      */
-    private function customerBalanceQuery(): QueryBackedBuilder
+    private function customerBalanceQuery(): Builder
     {
-        $query = CustomerBalance::query();
+        return CustomerBalance::query();
+    }
 
-        self::assertInstanceOf(QueryBackedBuilder::class, $query);
-
-        return $query;
+    /**
+     * @param Builder<CustomerBalance> $query
+     * @param array<array-key, mixed> $params
+     * @return Builder<CustomerBalance>
+     */
+    private function withParams(Builder $query, array $params = [], mixed ...$namedParams): Builder
+    {
+        return (new CustomerBalance())->scopeWithParams($query, $params, ...$namedParams);
     }
 }

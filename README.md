@@ -35,6 +35,15 @@ $balances = CustomerBalance::query()
 in the chain before execution. The params are passed as named arguments to
 `newSource()`.
 
+Panorama does not replace Eloquent's builder. It registers a normal global scope
+and a normal local scope, so custom builders and query-builder extensions can
+still participate in the query. The test suite includes compatibility coverage
+for:
+
+- `staudenmeir/laravel-cte`
+- `tpetry/laravel-postgresql-enhanced`
+- consumer-defined custom Eloquent builders
+
 ## Requirements
 
 Panorama targets Laravel versions that are currently supported:

@@ -4,26 +4,39 @@ declare(strict_types=1);
 
 namespace BumpCore\Panorama;
 
-use BumpCore\Panorama\Contracts\QueryBackedModel;
-use BumpCore\Panorama\Eloquent\QueryBackedBuilder;
+use BumpCore\Panorama\Eloquent\QuerySourceScope;
 use BumpCore\Panorama\Exceptions\MissingQuerySourceException;
+use BumpCore\Panorama\Support\QuerySourceState;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Model
- * @mixin QueryBackedModel
  */
 trait BackedByQuery
 {
     /**
-     * Creates a Panorama-aware Eloquent builder for the model.
-     *
-     * @param \Illuminate\Database\Query\Builder $query
-     * @return QueryBackedBuilder<Model>
+     * Registers the source query scope.
      */
-    public function newEloquentBuilder($query): QueryBackedBuilder
+    public static function bootBackedByQuery(): void
     {
-        return new QueryBackedBuilder($query);
+        static::addGlobalScope(new QuerySourceScope());
+    }
+
+    /**
+     * Adds or replaces params that will be passed to the model's newSource() method.
+     *
+     * @template TModel of Model
+     *
+     * @param EloquentBuilder<TModel> $query
+     * @param array<array-key, mixed> $params
+     * @return EloquentBuilder<TModel>
+     */
+    public function scopeWithParams(EloquentBuilder $query, array $params = [], mixed ...$namedParams): EloquentBuilder
+    {
+        QuerySourceState::mergeParams($query, $params, $namedParams);
+
+        return $query;
     }
 
     /**
