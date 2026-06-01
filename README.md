@@ -5,14 +5,14 @@ Panorama gives Eloquent models a query-backed source. Add one trait, define a
 while its data comes from a subquery.
 
 ```php
-use BumpCore\Panorama\BackedByQuery;
+use Bumpcore\Panorama\HasSource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
-final class CustomerBalance extends Model
+class CustomerBalance extends Model
 {
-    use BackedByQuery;
+    use HasSource;
 
     protected $primaryKey = 'customer_id';
 

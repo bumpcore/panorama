@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Compatibility;
+namespace Bumpcore\Panorama\Tests\Compatibility;
 
-use BumpCore\Panorama\Tests\Fixtures\CteCustomerBalance;
-use BumpCore\Panorama\Tests\Fixtures\EnhancedPostgresCustomerBalance;
-use BumpCore\Panorama\Tests\Fixtures\Invoice;
-use BumpCore\Panorama\Tests\TestCase;
+use Bumpcore\Panorama\Tests\Fixtures\CteCustomerBalance;
+use Bumpcore\Panorama\Tests\Fixtures\EnhancedPostgresCustomerBalance;
+use Bumpcore\Panorama\Tests\Fixtures\Invoice;
+use Bumpcore\Panorama\Tests\TestCase;
 use Staudenmeir\LaravelCte\Query\Builder as CteBuilder;
 use Tpetry\PostgresqlEnhanced\Query\Builder as EnhancedPostgresBuilder;
 
-final class ExternalBuilderCompatibilityTest extends TestCase
+class ExternalBuilderCompatibilityTest extends TestCase
 {
+    /**
+     * Verifies that Staudenmeir CTE query builder methods remain available.
+     */
     public function test_it_preserves_staudenmeir_cte_query_builder_methods(): void
     {
         $query = CteCustomerBalance::query();
@@ -29,6 +32,9 @@ final class ExternalBuilderCompatibilityTest extends TestCase
         self::assertSame(['open', 1], $query->toBase()->getBindings());
     }
 
+    /**
+     * Verifies that PostgreSQL enhanced query builder methods remain available.
+     */
     public function test_it_preserves_tpetry_postgresql_enhanced_query_builder_methods(): void
     {
         $query = EnhancedPostgresCustomerBalance::query();

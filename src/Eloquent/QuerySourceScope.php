@@ -2,21 +2,24 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Eloquent;
+namespace Bumpcore\Panorama\Eloquent;
 
-use BumpCore\Panorama\Exceptions\InvalidQuerySourceException;
-use BumpCore\Panorama\Support\QuerySourceState;
+use Bumpcore\Panorama\Exceptions\InvalidQuerySourceException;
+use Bumpcore\Panorama\Support\QuerySourceState;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use ReflectionMethod;
 
-final class QuerySourceScope implements Scope
+class QuerySourceScope implements Scope
 {
     /**
+     * Wraps the model query in the configured Panorama source query.
+     *
      * @param EloquentBuilder<*> $builder
      */
+    #[\Override]
     public function apply(EloquentBuilder $builder, Model $model): void
     {
         if (! method_exists($model, 'buildPanoramaSource') || ! method_exists($model, 'panoramaSourceAlias')) {
@@ -36,6 +39,8 @@ final class QuerySourceScope implements Scope
     }
 
     /**
+     * Resolves and validates the source query returned by the model.
+     *
      * @param array<string, mixed> $params
      */
     private function buildSourceQuery(Model $model, array $params): QueryBuilder
@@ -53,6 +58,9 @@ final class QuerySourceScope implements Scope
         throw InvalidQuerySourceException::forSource($model::class, $source);
     }
 
+    /**
+     * Resolves the table alias used for the wrapped source query.
+     */
     private function sourceAlias(Model $model): string
     {
         $alias = (new ReflectionMethod($model, 'panoramaSourceAlias'))->invoke($model);

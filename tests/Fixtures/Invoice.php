@@ -2,13 +2,19 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Fixtures;
+namespace Bumpcore\Panorama\Tests\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
 
-final class Invoice extends Model
+class Invoice extends Model
 {
+    /**
+     * Indicates that the invoice fixture does not manage timestamps.
+     */
     public $timestamps = false;
 
+    /**
+     * Allows tests to mass assign invoice fixture attributes freely.
+     */
     protected $guarded = [];
 }

@@ -2,27 +2,45 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Fixtures;
+namespace Bumpcore\Panorama\Tests\Fixtures;
 
-use BumpCore\Panorama\BackedByQuery;
+use Bumpcore\Panorama\HasSource;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 
-final class CustomerBalanceFromQueryBuilder extends Model
+class CustomerBalanceFromQueryBuilder extends Model
 {
-    use BackedByQuery;
+    use HasSource;
 
+    /**
+     * Indicates that this query-backed fixture does not manage timestamps.
+     */
     public $timestamps = false;
 
+    /**
+     * Uses a dedicated table alias for query builder source tests.
+     */
     protected $table = 'customer_balance_query_builder';
 
+    /**
+     * Uses the customer id as the model key for hydration assertions.
+     */
     protected $primaryKey = 'customer_id';
 
+    /**
+     * Indicates that the fixture key is supplied by the source query.
+     */
     public $incrementing = false;
 
+    /**
+     * Allows tests to mass assign query-backed fixture attributes freely.
+     */
     protected $guarded = [];
 
+    /**
+     * Builds a base query builder source for the requested customer.
+     */
     public function newSource(int $customer_id): Builder
     {
         return Capsule::table('invoices')

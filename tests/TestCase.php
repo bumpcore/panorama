@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests;
+namespace Bumpcore\Panorama\Tests;
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,8 +11,15 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Holds the in-memory database capsule for each test case.
+     */
     protected Capsule $database;
 
+    /**
+     * Boots an isolated in-memory Eloquent database before each test.
+     */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -30,6 +37,9 @@ abstract class TestCase extends BaseTestCase
         $this->seedData();
     }
 
+    /**
+     * Creates the minimal customer and invoice tables used by fixtures.
+     */
     private function createSchema(): void
     {
         $schema = $this->schema();
@@ -47,6 +57,9 @@ abstract class TestCase extends BaseTestCase
         });
     }
 
+    /**
+     * Inserts deterministic fixture rows used by query source assertions.
+     */
     private function seedData(): void
     {
         Capsule::table('customers')->insert([
@@ -62,6 +75,9 @@ abstract class TestCase extends BaseTestCase
         ]);
     }
 
+    /**
+     * Returns the schema builder for the in-memory test connection.
+     */
     private function schema(): Builder
     {
         return $this->database->getConnection()->getSchemaBuilder();

@@ -9,6 +9,7 @@ parameters:
         - tests
     parallel:
         maximumNumberOfProcesses: 1
+    checkMissingOverrideMethodAttribute: true
     reportMaybesInMethodSignatures: true
     reportMaybesInPropertyPhpDocTypes: true
     treatPhpDocTypesAsCertain: true

@@ -2,28 +2,45 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Fixtures;
+namespace Bumpcore\Panorama\Tests\Fixtures;
 
-use BumpCore\Panorama\BackedByQuery;
+use Bumpcore\Panorama\HasSource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-final class CustomerBalance extends Model
+class CustomerBalance extends Model
 {
-    use BackedByQuery;
+    use HasSource;
 
+    /**
+     * Indicates that this query-backed fixture does not manage timestamps.
+     */
     public $timestamps = false;
 
+    /**
+     * Uses a dedicated table alias for customer balance source tests.
+     */
     protected $table = 'customer_balances';
 
+    /**
+     * Uses the customer id as the model key for hydration assertions.
+     */
     protected $primaryKey = 'customer_id';
 
+    /**
+     * Indicates that the fixture key is supplied by the source query.
+     */
     public $incrementing = false;
 
+    /**
+     * Allows tests to mass assign customer balance attributes freely.
+     */
     protected $guarded = [];
 
     /**
+     * Builds a grouped invoice balance source for the optional filters.
+     *
      * @return Builder<Invoice>
      */
     public function newSource(?int $customer_id = null, ?string $status = null): Builder
@@ -47,6 +64,8 @@ final class CustomerBalance extends Model
     }
 
     /**
+     * Defines the customer relation used to prove Eloquent relations still work.
+     *
      * @return BelongsTo<Customer, $this>
      */
     public function customer(): BelongsTo
@@ -55,8 +74,11 @@ final class CustomerBalance extends Model
     }
 
     /**
+     * Defines type casts for hydrated aggregate columns.
+     *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [

@@ -5,12 +5,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "BumpCore\\Panorama\\": "src/"
+            "Bumpcore\\Panorama\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "BumpCore\\Panorama\\Tests\\": "tests/"
+            "Bumpcore\\Panorama\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -22,7 +22,7 @@
         "laravel/boost": "^2.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-strict-rules": "^2.0",
-        "phpunit/phpunit": "^12.0",
+        "phpunit/phpunit": "^11.5 || ^12.0",
         "staudenmeir/laravel-cte": "^1.12",
         "tpetry/laravel-postgresql-enhanced": "^2.4 || ^3.6"
     },

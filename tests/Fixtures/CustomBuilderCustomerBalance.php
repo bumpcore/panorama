@@ -2,22 +2,34 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Fixtures;
+namespace Bumpcore\Panorama\Tests\Fixtures;
 
-use BumpCore\Panorama\BackedByQuery;
+use Bumpcore\Panorama\HasSource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
-final class CustomBuilderCustomerBalance extends Model
+class CustomBuilderCustomerBalance extends Model
 {
-    use BackedByQuery;
+    use HasSource;
 
+    /**
+     * Indicates that this query-backed fixture does not manage timestamps.
+     */
     public $timestamps = false;
 
+    /**
+     * Uses a dedicated table alias for custom builder source tests.
+     */
     protected $table = 'custom_builder_customer_balances';
 
+    /**
+     * Allows tests to mass assign custom builder fixture attributes freely.
+     */
     protected $guarded = [];
 
+    /**
+     * Builds a grouped invoice balance source for the optional customer.
+     */
     public function newSource(?int $customer_id = null): QueryBuilder
     {
         $query = Invoice::query()->getQuery();
@@ -33,16 +45,22 @@ final class CustomBuilderCustomerBalance extends Model
     }
 
     /**
+     * Creates the custom Eloquent builder used by this fixture.
+     *
      * @param QueryBuilder $query
      */
+    #[\Override]
     public function newEloquentBuilder($query): CustomCustomerBalanceBuilder
     {
         return new CustomCustomerBalanceBuilder($query);
     }
 
     /**
+     * Defines type casts for hydrated aggregate columns.
+     *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [

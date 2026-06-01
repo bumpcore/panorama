@@ -42,6 +42,8 @@ exit(runCommand([PHP_BINARY, $rootDirectory . '/scripts/assert-coverage.php', $c
  * Runs a command and streams its output to the current process.
  *
  * @param list<string> $command
+ * @param string $workingDirectory
+ * @return int
  */
 function runCommand(array $command, string $workingDirectory): int
 {
@@ -67,6 +69,9 @@ function runCommand(array $command, string $workingDirectory): int
 
 /**
  * Finds an executable on the current PATH.
+ *
+ * @param string $name
+ * @return string|null
  */
 function findExecutable(string $name): ?string
 {

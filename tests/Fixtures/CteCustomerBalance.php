@@ -2,23 +2,35 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Tests\Fixtures;
+namespace Bumpcore\Panorama\Tests\Fixtures;
 
-use BumpCore\Panorama\BackedByQuery;
+use Bumpcore\Panorama\HasSource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Staudenmeir\LaravelCte\Query\Builder as CteBuilder;
 
-final class CteCustomerBalance extends Model
+class CteCustomerBalance extends Model
 {
-    use BackedByQuery;
+    use HasSource;
 
+    /**
+     * Indicates that this CTE fixture does not manage timestamps.
+     */
     public $timestamps = false;
 
+    /**
+     * Uses a dedicated table alias for CTE source tests.
+     */
     protected $table = 'cte_customer_balances';
 
+    /**
+     * Allows tests to mass assign CTE fixture attributes freely.
+     */
     protected $guarded = [];
 
+    /**
+     * Builds a grouped invoice balance source for the optional customer.
+     */
     public function newSource(?int $customer_id = null): QueryBuilder
     {
         $query = Invoice::query()->getQuery();
@@ -33,6 +45,10 @@ final class CteCustomerBalance extends Model
         return $query;
     }
 
+    /**
+     * Creates the CTE-aware base query builder for this fixture.
+     */
+    #[\Override]
     protected function newBaseQueryBuilder(): CteBuilder
     {
         $connection = $this->getConnection();
@@ -41,8 +57,11 @@ final class CteCustomerBalance extends Model
     }
 
     /**
+     * Defines type casts for hydrated aggregate columns.
+     *
      * @return array<string, string>
      */
+    #[\Override]
     protected function casts(): array
     {
         return [

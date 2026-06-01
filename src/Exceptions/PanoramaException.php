@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Exceptions;
+namespace Bumpcore\Panorama\Exceptions;
 
 use RuntimeException;
 

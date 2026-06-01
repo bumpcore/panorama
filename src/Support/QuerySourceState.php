@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Support;
+namespace Bumpcore\Panorama\Support;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use InvalidArgumentException;
@@ -11,14 +11,18 @@ use WeakMap;
 /**
  * @internal
  */
-final class QuerySourceState
+class QuerySourceState
 {
     /**
+     * Stores per-builder source params without extending builder instances.
+     *
      * @var WeakMap<object, array<string, mixed>>|null
      */
     private static ?WeakMap $params = null;
 
     /**
+     * Merges array and named params into the state for the given builder.
+     *
      * @param EloquentBuilder<*> $builder
      * @param array<array-key, mixed> $params
      * @param array<array-key, mixed> $namedParams
@@ -39,6 +43,8 @@ final class QuerySourceState
     }
 
     /**
+     * Returns the params currently attached to the given builder.
+     *
      * @param EloquentBuilder<*> $builder
      * @return array<string, mixed>
      */
@@ -48,6 +54,8 @@ final class QuerySourceState
     }
 
     /**
+     * Persists normalized params for the given builder.
+     *
      * @param EloquentBuilder<*> $builder
      * @param array<string, mixed> $params
      */
@@ -57,6 +65,8 @@ final class QuerySourceState
     }
 
     /**
+     * Returns the weak map used for builder-scoped state.
+     *
      * @return WeakMap<object, array<string, mixed>>
      */
     private static function map(): WeakMap
@@ -65,6 +75,8 @@ final class QuerySourceState
     }
 
     /**
+     * Ensures params are named so they can be passed to newSource().
+     *
      * @param array<array-key, mixed> $params
      * @return array<string, mixed>
      */

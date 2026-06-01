@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama;
+namespace Bumpcore\Panorama;
 
-use BumpCore\Panorama\Eloquent\QuerySourceScope;
-use BumpCore\Panorama\Exceptions\MissingQuerySourceException;
-use BumpCore\Panorama\Support\QuerySourceState;
+use Bumpcore\Panorama\Eloquent\QuerySourceScope;
+use Bumpcore\Panorama\Exceptions\MissingQuerySourceException;
+use Bumpcore\Panorama\Support\QuerySourceState;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @mixin Model
  */
-trait BackedByQuery
+trait HasSource
 {
     /**
      * Registers the source query scope.
      */
-    public static function bootBackedByQuery(): void
+    public static function bootHasSource(): void
     {
         static::addGlobalScope(new QuerySourceScope());
     }

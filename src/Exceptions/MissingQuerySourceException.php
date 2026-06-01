@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace BumpCore\Panorama\Exceptions;
+namespace Bumpcore\Panorama\Exceptions;
 
-final class MissingQuerySourceException extends PanoramaException
+class MissingQuerySourceException extends PanoramaException
 {
+    /**
+     * Creates an exception for models that do not define a source query.
+     */
     public static function forModel(string $modelClass): self
     {
         return new self(sprintf('Model [%s] must override newSource().', $modelClass));
