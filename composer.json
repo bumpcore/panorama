@@ -3,6 +3,13 @@
     "description": "Query-backed Eloquent models for Laravel.",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdulkadir Cemiloglu",
+            "email": "kadir.cemiloglu1@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Bumpcore\\Panorama\\": "src/"

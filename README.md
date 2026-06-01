@@ -21,6 +21,7 @@ up Eloquent relations and builder chaining.
 * [Exceptions](#exceptions)
 * [Testing](#testing)
 * [Contribution](#contribution)
+* [Changelog](#changelog)
 * [Credits](#credits)
 * [License](#license)
 
@@ -233,6 +234,10 @@ composer cs:check
 composer analyse
 composer test
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Credits
 
