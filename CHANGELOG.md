@@ -7,6 +7,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-02
+
+### Added
+
+- Add Laravel Boost AI guidelines for Panorama usage.
+
 ## [0.1.0] - 2026-06-01
 
 ### Added
@@ -20,5 +26,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Add PHPUnit, PHPStan level 9, PHP CS Fixer, GitHub Actions, and a 100% coverage gate.
 - Add README documentation and MIT license.
 
-[Unreleased]: https://github.com/bumpcore/panorama/compare/v0.1.0...0.x
+[Unreleased]: https://github.com/bumpcore/panorama/compare/v0.1.1...0.x
+[0.1.1]: https://github.com/bumpcore/panorama/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/bumpcore/panorama/releases/tag/v0.1.0
