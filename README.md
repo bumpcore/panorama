@@ -1,6 +1,6 @@
-# Bumpcore Panorama
+# bumpcore Panorama
 
-Bumpcore Panorama is a Laravel package for building Eloquent models from query
+bumpcore Panorama is a Laravel package for building Eloquent models from query
 sources. It lets a model behave like a normal read model while its rows come
 from a subquery, aggregate, CTE, or custom query builder source.
 
@@ -27,7 +27,7 @@ up Eloquent relations and builder chaining.
 
 ## Version Table
 
-| Bumpcore Panorama | Laravel       | PHP           |
+| bumpcore Panorama | Laravel       | PHP           |
 |-------------------|---------------|---------------|
 | 0.x               | ^12.0         | ^8.2          |
 | 0.x               | ^13.0         | ^8.3          |
